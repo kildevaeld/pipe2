@@ -1,3 +1,4 @@
+/// <reference path="../typings/main.d.ts" />
 
 import {Transform, Readable, Stream} from 'stream';
 import * as es from 'event-stream';
@@ -27,10 +28,10 @@ export class Pipe2 extends Transform {
   }
 
   constructor() {
-    super({objectMode: true});   
+    super({objectMode: true});
   }
 
-  private _transform (chunk, enc, cb) {
+  _transform (chunk, enc, cb) {
     this.push(chunk, enc);
     cb();
   }
@@ -74,7 +75,7 @@ export class Pipe2 extends Transform {
     });
   }
 
-  json(options): Pipe2 {
+  json(options?): Pipe2 {
     let out = false;
 
     let stream = this.buffer(true, options).pipe(es.through( function (chunk, enc , callback) {

@@ -6,10 +6,10 @@ export declare class Pipe2 extends Transform {
     static gene: any;
     static promise(promise: Promise<any>): Pipe2;
     constructor();
-    private _transform(chunk, enc, cb);
+    _transform(chunk: any, enc: any, cb: any): void;
     map<T, U>(fn: (file: T) => Promise<U>): Pipe2;
     buffer(escape?: boolean, options?: any): Pipe2;
-    json(options: any): Pipe2;
+    json(options?: any): Pipe2;
     toArray<T>(): Promise<T>;
     toBuffer(): Promise<Buffer>;
     wait(): Promise<void>;
