@@ -1,4 +1,3 @@
-/// <reference path="../typings/main.d.ts" />
 
 import {Transform, Readable, Stream} from 'stream';
 import * as es from 'event-stream';
