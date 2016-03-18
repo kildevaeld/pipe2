@@ -28,9 +28,9 @@ export class Pipe2<T> extends Transform {
         return new GenToStream(arrayToGenerator(array)).pipe(p);
     }
 
-    static stream(stream: Stream): Pipe2<any> {
+    static stream(stream?: Stream): Pipe2<any> {
         let p = new Pipe2();
-        return stream.pipe(p);
+        return stream != null ? stream.pipe(p) : p;
     }
 
     static src(path: string | string[], options?: vfs.ISrcOptions): Pipe2<File> {
