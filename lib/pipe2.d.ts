@@ -1,16 +1,29 @@
 /// <reference path="../typings/main.d.ts" />
-import { Transform, Readable } from 'stream';
-export declare class Pipe2 extends Transform {
-    static array(array: any[]): Pipe2;
-    static stream(stream: Readable): Pipe2;
-    static gene: any;
-    static promise(promise: Promise<any>): Pipe2;
+import { Transform, Stream } from 'stream';
+import vfs from 'vinyl-fs';
+export declare const map: {
+    json(options?: any): (file: any) => Promise<any>;
+    excel(options?: any): void;
+};
+export declare class Pipe2<T> extends Transform {
+    static map: {
+        json(options?: any): (file: any) => Promise<any>;
+        excel(options?: any): void;
+    };
+    static array<T>(array: T[]): Pipe2<T>;
+    static stream(stream: Stream): Pipe2<any>;
+    static src(path: string | string[], options?: vfs.ISrcOptions): Pipe2<File>;
+    static generator<T>(fn: IterableIterator<T>): Pipe2<T>;
+    static promise<T>(promise: Promise<T>): Pipe2<T>;
     constructor();
     _transform(chunk: any, enc: any, cb: any): void;
-    map<T, U>(fn: (file: T) => Promise<U>): Pipe2;
-    buffer(escape?: boolean, options?: any): Pipe2;
-    json(options?: any): Pipe2;
-    toArray<T>(): Promise<T>;
+    map<T, U>(fn: (file: T) => Promise<U>): Pipe2<U>;
+    vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File>;
+    buffer(escape?: boolean, options?: any): Pipe2<Buffer>;
+    json(options?: any): Pipe2<any>;
+    wrap(stream: Stream): Pipe2<any>;
+    toArray(): Promise<T[]>;
     toBuffer(): Promise<Buffer>;
+    toDest(path: string): Promise<void>;
     wait(): Promise<void>;
 }

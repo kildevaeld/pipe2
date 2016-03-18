@@ -6,10 +6,15 @@
         "sourceMap": false,
         "outDir": "lib",
         "declaration": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true
     },
     "files": [
       "src/pipe2.ts",
-      "src/utils.ts"
+      "src/utils.ts",
+      "src/map/json.ts",
+      "src/map/index.ts",
+      "src/map/excel/transform.ts",
+      "src/map/excel/index.ts"
     ]
 }

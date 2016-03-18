@@ -1,6 +1,6 @@
 {
   "name": "pipe2",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,9 +9,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dottie": "^1.1.1",
     "end-of-stream": "^1.1.0",
     "event-stream": "^3.3.2",
-    "vinyl": "^1.1.1"
+    "flatten": "^1.0.2",
+    "vinyl": "^1.1.1",
+    "vinyl-fs": "^2.4.2",
+    "xlsx": "^0.8.0"
   },
   "typings": "lib/pipe2"
 }

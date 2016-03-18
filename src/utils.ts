@@ -9,6 +9,7 @@ export class GenToStream extends Readable {
 
   _read (size: number) {
     try {
+        
         var r = this.generator.next();
 
         if (false === r.done) {
