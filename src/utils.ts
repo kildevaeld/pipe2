@@ -1,6 +1,6 @@
 
 import {Readable, Stream} from 'stream'
-
+const Promise = require('any-promise');
 
 export class GenToStream extends Readable {
   constructor (private generator: IterableIterator<any>) {
@@ -9,7 +9,7 @@ export class GenToStream extends Readable {
 
   _read (size: number) {
     try {
-        
+
         var r = this.generator.next();
 
         if (false === r.done) {

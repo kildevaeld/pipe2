@@ -11,7 +11,7 @@ export declare class Pipe2<T> extends Transform {
         excel(options?: any): void;
     };
     static array<T>(array: T[]): Pipe2<T>;
-    static stream(stream: Stream): Pipe2<any>;
+    static stream(stream?: Stream): Pipe2<any>;
     static src(path: string | string[], options?: vfs.ISrcOptions): Pipe2<File>;
     static generator<T>(fn: IterableIterator<T>): Pipe2<T>;
     static promise<T>(promise: Promise<T>): Pipe2<T>;

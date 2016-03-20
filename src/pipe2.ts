@@ -7,6 +7,8 @@ import vfs from 'vinyl-fs'
 import * as Path from 'path';
 import * as mappings from './map/index';
 
+const Promise = require('any-promise');
+
 const eos = require('end-of-stream'),
     File = require('vinyl');
 
@@ -15,7 +17,7 @@ export const map = {
     json (options?) {
         return mappings.JsonMapper(options);
     },
-    
+
     excel (options?) {
         return mappings.ExcelMap(options);
     }
@@ -46,7 +48,7 @@ export class Pipe2<T> extends Transform {
         let pipe = new Pipe2();
         return promiseToStream(promise).pipe(pipe);
     }
-    
+
 
     constructor() {
         super({ objectMode: true });
@@ -61,14 +63,14 @@ export class Pipe2<T> extends Transform {
         let p = new Pipe2();
 
         return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
-            fn(file).then((data) => {
+            Promise.resolve(fn(file)).then((data) => {
                 cb(null, data);
             }).catch(cb);
         })).pipe(p);
     }
 
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File> {
-        return this.map<any,File>(async (file): Promise<File> => {
+        return this.map<any,File>((file): any => {
             if (!(file instanceof File)) {
                 if (!Buffer.isBuffer(file) || !(file instanceof Stream)) {
                     if (typeof file !== 'string') {
@@ -76,7 +78,7 @@ export class Pipe2<T> extends Transform {
                     }
                     file = new Buffer(file);
                 }
-                
+
                 var opts: any = {
                     contents: file
                 };
@@ -143,7 +145,7 @@ export class Pipe2<T> extends Transform {
 
         return Pipe2.stream(stream);
     }
-    
+
     wrap (stream:Stream): Pipe2<any> {
         return Pipe2.stream(stream);
     }
@@ -166,13 +168,13 @@ export class Pipe2<T> extends Transform {
             }));
         });
     }
-    
+
     toDest(path:string): Promise<void> {
         return this.wrap(vfs.dest(path)).wait();
     }
 
     wait(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             eos(this, (e) => {
                 if (e) return reject(e);
                 return resolve();
