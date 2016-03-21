@@ -7,7 +7,7 @@ import {Transform} from './transform'
 
 export function ExcelMap (options) {
   options = options || {};
-  async function transform (file): Promise<File> {
+  return async function transform (file): Promise<File> {
 
     if (!(file instanceof File)) {
       throw new Error('excel: not a vinyl stream');

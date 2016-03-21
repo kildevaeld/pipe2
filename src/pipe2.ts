@@ -6,11 +6,10 @@ import {promiseToStream, GenToStream, arrayToGenerator} from './utils';
 import vfs from 'vinyl-fs'
 import * as Path from 'path';
 import * as mappings from './map/index';
-
+import Vinyl from 'vinyl';
 const Promise = require('any-promise');
-
-const eos = require('end-of-stream'),
-    File = require('vinyl');
+const File = require('vinyl');
+const eos = require('end-of-stream');
 
 
 export const map = {
