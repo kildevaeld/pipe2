@@ -19,15 +19,15 @@ function _wrap<T>(fn: (file:any) => Promise<T>): Pipe2<T> {
         Promise.resolve(fn.call(this, chunk)).then( data => callback(null, data) )
         .catch(callback);
     });
-    
+
     console.log('jeerere')
-    
+
     return Pipe2.stream().pipe(pipe).pipe(Pipe2.stream());
 }
 
 export const map = {
     json<T>(options?) {
-         
+
         return mappings.JsonMapper<T>(options);
     },
 
@@ -72,7 +72,7 @@ export class Pipe2<T> extends Transform {
         cb();
     }
 
-    map<T, U>(fn: (file: T) => Promise<U>): Pipe2<U> {
+    map<T, U>(fn: (file: T) => any, flush?:() => any): Pipe2<U> {
         let p = new Pipe2();
 
         /*return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
@@ -84,9 +84,16 @@ export class Pipe2<T> extends Transform {
         return this.pipe<Pipe2<U>>(<any>through2.obj(function (chunk, enc, cb) {
             Promise.resolve(fn.call(this, chunk)).then( data => cb(null, data) )
             .catch((e) => {
-                console.log(e.stack, fn);
                 self.emit('error', e);
+                throw e;
             });
+        }, (cb) => {
+            if (flush) {
+                return Promise.resolve(flush.call(this)).then( () => cb(null) )
+                .catch(cb);
+            }
+            cb();
+
         })).pipe(Pipe2.stream());
     }
 

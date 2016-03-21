@@ -18,7 +18,7 @@ export declare class Pipe2<T> extends Transform {
     static promise<T>(promise: Promise<T>): Pipe2<T>;
     constructor();
     _transform(chunk: any, enc: any, cb: any): void;
-    map<T, U>(fn: (file: T) => Promise<U>): Pipe2<U>;
+    map<T, U>(fn: (file: T) => any, flush?: () => any): Pipe2<U>;
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File>;
     buffer(escape?: boolean, options?: any): Pipe2<Buffer>;
     json(options?: any): Pipe2<Buffer>;
