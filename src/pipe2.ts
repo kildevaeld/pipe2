@@ -32,7 +32,7 @@ export const map = {
     },
 
     excel (options?) {
-        return _wrap(mappings.ExcelMap(options));
+        return mappings.ExcelMap(options);
     }
 }
 
