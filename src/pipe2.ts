@@ -26,9 +26,9 @@ function _wrap<T>(fn: (file:any) => Promise<T>): Pipe2<T> {
 }
 
 export const map = {
-    json (options?) {
+    json<T>(options?) {
          
-        return mappings.JsonMapper(options);
+        return mappings.JsonMapper<T>(options);
     },
 
     excel (options?) {

@@ -1,1 +1,1 @@
-export declare function JsonMapper(options: any): (file: any) => Promise<any>;
+export declare function JsonMapper<T>(options: any): (file: any) => Promise<T>;

@@ -14,10 +14,10 @@ var _check = function (obj:any, picks:string[]): boolean {
   return Object.keys(out).length !== 0;
 };
 
-export function JsonMapper (options) {
+export function JsonMapper<T>(options) {
   options = options||{};
   let split = options.split||false;
-  return async function transform (file:any): Promise<any> {
+  return async function transform (file:any): Promise<T> {
     let str, json;
    
     if (file instanceof File) {
