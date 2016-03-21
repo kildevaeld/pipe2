@@ -1,7 +1,9 @@
 {
   "name": "pipe2",
   "version": false,
-  "dependencies": {},
+  "dependencies": {
+    "through2": "registry:npm/through2#2.0.0+20160308004148"
+  },
   "ambientDependencies": {
     "event-stream": "registry:dt/event-stream#0.0.0+20160216030252",
     "glob-stream": "registry:dt/glob-stream#3.1.12+20160316155526",

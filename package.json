@@ -1,6 +1,6 @@
 {
   "name": "pipe2",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,7 @@
     "end-of-stream": "^1.1.0",
     "event-stream": "^3.3.2",
     "flatten": "^1.0.2",
+    "through2": "^2.0.1",
     "vinyl": "^1.1.1",
     "vinyl-fs": "^2.4.2",
     "xlsx": "^0.8.0"

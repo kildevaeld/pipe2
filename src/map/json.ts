@@ -1,9 +1,8 @@
 'use strict';
-import File from 'vinyl';
 import {Pipe2} from '../pipe2';
 
 const dottie = require('dottie')
-
+const File = require('vinyl');
 
 var _check = function (obj:any, picks:string[]): boolean {
   var out = {};
@@ -20,6 +19,7 @@ export function JsonMapper (options) {
   let split = options.split||false;
   return async function transform (file:any): Promise<any> {
     let str, json;
+   
     if (file instanceof File) {
       if (file.isNull()) return null;
       if (file.isStream()) {
@@ -42,9 +42,9 @@ export function JsonMapper (options) {
     if (!json) {
       json = JSON.parse(str);
     }
-
+     
     if (!options.map) {
-
+        
       if (Array.isArray(json) && split) {
         for (var i=0;i<json.length;i++) {
           this.push(json[i]);

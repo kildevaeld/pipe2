@@ -4,12 +4,12 @@ import vfs from 'vinyl-fs';
 import Vinyl from 'vinyl';
 export declare const map: {
     json(options?: any): (file: any) => Promise<any>;
-    excel(options?: any): (file: any) => Promise<Vinyl>;
+    excel(options?: any): Pipe2<Vinyl>;
 };
 export declare class Pipe2<T> extends Transform {
     static map: {
         json(options?: any): (file: any) => Promise<any>;
-        excel(options?: any): (file: any) => Promise<Vinyl>;
+        excel(options?: any): Pipe2<Vinyl>;
     };
     static array<T>(array: T[]): Pipe2<T>;
     static stream(stream?: Stream): Pipe2<any>;
@@ -21,7 +21,7 @@ export declare class Pipe2<T> extends Transform {
     map<T, U>(fn: (file: T) => Promise<U>): Pipe2<U>;
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File>;
     buffer(escape?: boolean, options?: any): Pipe2<Buffer>;
-    json(options?: any): Pipe2<any>;
+    json(options?: any): Pipe2<Buffer>;
     wrap(stream: Stream): Pipe2<any>;
     toArray(): Promise<T[]>;
     toBuffer(): Promise<Buffer>;

@@ -7,18 +7,32 @@ import vfs from 'vinyl-fs'
 import * as Path from 'path';
 import * as mappings from './map/index';
 import Vinyl from 'vinyl';
+import * as through2 from 'through2'
 const Promise = require('any-promise');
 const File = require('vinyl');
 const eos = require('end-of-stream');
 
 
+function _wrap<T>(fn: (file:any) => Promise<T>): Pipe2<T> {
+    let pipe = through2.obj(function (chunk, enc, callback) {
+        console.log('HERE')
+        Promise.resolve(fn.call(this, chunk)).then( data => callback(null, data) )
+        .catch(callback);
+    });
+    
+    console.log('jeerere')
+    
+    return Pipe2.stream().pipe(pipe).pipe(Pipe2.stream());
+}
+
 export const map = {
     json (options?) {
+         
         return mappings.JsonMapper(options);
     },
 
     excel (options?) {
-        return mappings.ExcelMap(options);
+        return _wrap(mappings.ExcelMap(options));
     }
 }
 
@@ -61,11 +75,19 @@ export class Pipe2<T> extends Transform {
     map<T, U>(fn: (file: T) => Promise<U>): Pipe2<U> {
         let p = new Pipe2();
 
-        return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
+        /*return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
             Promise.resolve(fn(file)).then((data) => {
                 cb(null, data);
             }).catch(cb);
-        })).pipe(p);
+        })).pipe(p);*/
+        var self = this;
+        return this.pipe<Pipe2<U>>(<any>through2.obj(function (chunk, enc, cb) {
+            Promise.resolve(fn.call(this, chunk)).then( data => cb(null, data) )
+            .catch((e) => {
+                console.log(e.stack, fn);
+                self.emit('error', e);
+            });
+        })).pipe(Pipe2.stream());
     }
 
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File> {
@@ -121,7 +143,7 @@ export class Pipe2<T> extends Transform {
         });
     }
 
-    json(options?): Pipe2<any> {
+    json(options?): Pipe2<Buffer> {
         let out = false;
 
         let stream = this.buffer(true, options).pipe(es.through(function(chunk, enc, callback) {
