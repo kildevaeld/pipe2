@@ -72,7 +72,7 @@ export class Pipe2<T> extends Transform {
         cb();
     }
 
-    map<T, U>(fn: (file: T) => any, flush?:() => any): Pipe2<U> {
+    map<U>(fn: (file: T) => U, flush?:() => any): Pipe2<U> {
 
         let out = new Pipe2();
         /*return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
@@ -104,13 +104,13 @@ export class Pipe2<T> extends Transform {
     }
 
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File> {
-        return this.map<any,File>((file): any => {
+        return this.map<File>((file): any => {
             if (!(file instanceof File)) {
                 if (!Buffer.isBuffer(file) || !(file instanceof Stream)) {
                     if (typeof file !== 'string') {
-                        file = JSON.stringify(file);
+                        file = <any>JSON.stringify(file);
                     }
-                    file = new Buffer(file);
+                    file = <any>new Buffer(<any>file);
                 }
 
                 var opts: any = {
@@ -131,7 +131,7 @@ export class Pipe2<T> extends Transform {
         escape = escape || false
         options = options || {};
 
-        return this.map((file: any): Promise<Buffer> => {
+        return this.map<Buffer>((file: any) => {
 
             if (file instanceof File) {
                 if (file.isBuffer() ||  file.isNull()) {
