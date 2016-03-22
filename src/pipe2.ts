@@ -8,6 +8,7 @@ import * as Path from 'path';
 import * as mappings from './map/index';
 import Vinyl from 'vinyl';
 import * as through2 from 'through2'
+import {EventEmitter} from 'events';
 const Promise = require('any-promise');
 const File = require('vinyl');
 const eos = require('end-of-stream');
@@ -15,26 +16,22 @@ const eos = require('end-of-stream');
 
 function _wrap<T>(fn: (file:any) => Promise<T>): Pipe2<T> {
     let pipe = through2.obj(function (chunk, enc, callback) {
-        console.log('HERE')
         Promise.resolve(fn.call(this, chunk)).then( data => callback(null, data) )
         .catch(callback);
     });
 
-    console.log('jeerere')
-
-    return Pipe2.stream().pipe(pipe).pipe(Pipe2.stream());
+    return Pipe2.stream().wrap(pipe)//Pipe2.stream().pipe(pipe).pipe(Pipe2.stream());
 }
 
 export const map = {
     json<T>(options?) {
-
         return mappings.JsonMapper<T>(options);
     },
-
     excel (options?) {
         return mappings.ExcelMap(options);
     }
-}
+};
+
 
 export class Pipe2<T> extends Transform {
     static map = map;
@@ -45,6 +42,9 @@ export class Pipe2<T> extends Transform {
 
     static stream(stream?: Stream): Pipe2<any> {
         let p = new Pipe2();
+        // propagate error events downstream
+        if (stream) stream.once('error', e => p.emit('error', e));
+        
         return stream != null ? stream.pipe(p) : p;
     }
 
@@ -73,28 +73,34 @@ export class Pipe2<T> extends Transform {
     }
 
     map<T, U>(fn: (file: T) => any, flush?:() => any): Pipe2<U> {
-        let p = new Pipe2();
 
+        let out = new Pipe2();
         /*return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
             Promise.resolve(fn(file)).then((data) => {
                 cb(null, data);
             }).catch(cb);
         })).pipe(p);*/
         var self = this;
-        return this.pipe<Pipe2<U>>(<any>through2.obj(function (chunk, enc, cb) {
+        let pipe = this.pipe<Pipe2<U>>(<any>through2.obj(function (chunk, enc, cb) {
             Promise.resolve(fn.call(this, chunk)).then( data => cb(null, data) )
             .catch((e) => {
                 self.emit('error', e);
-                throw e;
             });
         }, (cb) => {
             if (flush) {
-                return Promise.resolve(flush.call(this)).then( () => cb(null) )
+                return Promise.resolve(flush.call(this))
+                .then( () => cb() )
                 .catch(cb);
             }
             cb();
 
-        })).pipe(Pipe2.stream());
+        })) //.pipe(Pipe2.stream());
+        
+        // propagate error events downstream
+        pipe.once('error', e => out.emit('error', e) );
+        
+        return pipe.pipe(out);
+        
     }
 
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File> {
@@ -170,7 +176,7 @@ export class Pipe2<T> extends Transform {
             }
             this.emit('end');
         }));
-
+       
         return Pipe2.stream(stream);
     }
 
@@ -178,9 +184,16 @@ export class Pipe2<T> extends Transform {
         return Pipe2.stream(stream);
     }
 
+    pipe<T extends EventEmitter>(stream: T, options?:any): T {
+        //stream.once('error', e => this.emit('error', e));
+        this.once('error', e => stream.emit('error', e));
+        return super.pipe(<any>stream, options);
+    }
+
 
     toArray(): Promise<T[]> {
         return new Promise((resolve, reject) => {
+            this.once('error', e => reject(e));
             this.pipe(<any>es.writeArray((e, b) => {
                 if (e) return reject(e);
                 resolve(b);
@@ -190,6 +203,7 @@ export class Pipe2<T> extends Transform {
 
     toBuffer(): Promise<Buffer> {
         return new Promise((resolve, reject) => {
+            this.once('error', e => reject(e));
             this.pipe(<any>es.wait((e, b) => {
                 if (e) return reject(e);
                 return resolve(b);

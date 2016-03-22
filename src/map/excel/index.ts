@@ -7,6 +7,7 @@ import {Transform} from './transform'
 
 export function ExcelMap (options) {
   options = options || {};
+
   return async function transform (file): Promise<File> {
 
     if (!(file instanceof File)) {

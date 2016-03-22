@@ -2,6 +2,7 @@
 import { Transform, Stream } from 'stream';
 import vfs from 'vinyl-fs';
 import Vinyl from 'vinyl';
+import { EventEmitter } from 'events';
 export declare const map: {
     json<T>(options?: any): (file: any) => Promise<T>;
     excel(options?: any): (file: any) => Promise<Vinyl>;
@@ -23,6 +24,7 @@ export declare class Pipe2<T> extends Transform {
     buffer(escape?: boolean, options?: any): Pipe2<Buffer>;
     json(options?: any): Pipe2<Buffer>;
     wrap(stream: Stream): Pipe2<any>;
+    pipe<T extends EventEmitter>(stream: T, options?: any): T;
     toArray(): Promise<T[]>;
     toBuffer(): Promise<Buffer>;
     toDest(path: string): Promise<void>;
