@@ -2,6 +2,7 @@
   "name": "pipe2",
   "version": false,
   "dependencies": {
+    "glob": "registry:npm/glob#6.0.0+20160211003958",
     "through2": "registry:npm/through2#2.0.0+20160308004148"
   },
   "ambientDependencies": {

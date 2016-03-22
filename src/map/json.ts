@@ -14,7 +14,12 @@ var _check = function (obj:any, picks:string[]): boolean {
   return Object.keys(out).length !== 0;
 };
 
-export function JsonMapper<T>(options) {
+export interface JsonMapperOptions {
+    map?: any;
+    split?: boolean
+}
+
+export function JsonMapper<T>(options?:JsonMapperOptions) {
   options = options||{};
   let split = options.split||false;
   return async function transform (file:any): Promise<T> {

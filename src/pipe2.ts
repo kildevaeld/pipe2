@@ -14,16 +14,7 @@ const File = require('vinyl');
 const eos = require('end-of-stream');
 
 
-function _wrap<T>(fn: (file:any) => Promise<T>): Pipe2<T> {
-    let pipe = through2.obj(function (chunk, enc, callback) {
-        Promise.resolve(fn.call(this, chunk)).then( data => callback(null, data) )
-        .catch(callback);
-    });
-
-    return Pipe2.stream().wrap(pipe)//Pipe2.stream().pipe(pipe).pipe(Pipe2.stream());
-}
-
-export const map = {
+const map = {
     json<T>(options?) {
         return mappings.JsonMapper<T>(options);
     },
@@ -35,11 +26,18 @@ export const map = {
 
 export class Pipe2<T> extends Transform {
     static map = map;
+    
+    /**
+     * Initialize new Pipe2 stream from an array
+     */
     static array<T>(array: T[]): Pipe2<T> {
         let p = new Pipe2();
         return new GenToStream(arrayToGenerator(array)).pipe(p);
     }
 
+    /**
+     * Initialize new Pipe2 stream a stream
+     */
     static stream(stream?: Stream): Pipe2<any> {
         let p = new Pipe2();
         // propagate error events downstream
@@ -48,15 +46,24 @@ export class Pipe2<T> extends Transform {
         return stream != null ? stream.pipe(p) : p;
     }
 
+    /**
+     * Create a vinyl stream;
+     */
     static src(path: string | string[], options?: vfs.ISrcOptions): Pipe2<File> {
         return Pipe2.stream(<any>vfs.src(path, options));
     }
 
+    /**
+     * Create a new stream from a generator function
+     */
     static generator<T>(fn:IterableIterator<T>): Pipe2<T> {
         let p = new Pipe2;
         return new GenToStream(fn).pipe(p);
     }
-
+    
+    /**
+     * Resolve promise and generate stream
+     */
     static promise<T>(promise: Promise<T>): Pipe2<T> {
         let pipe = new Pipe2();
         return promiseToStream(promise).pipe(pipe);
@@ -72,7 +79,13 @@ export class Pipe2<T> extends Transform {
         cb();
     }
 
-    map<U>(fn: (file: T) => U, flush?:() => any): Pipe2<U> {
+    /**
+     * Map  stream
+     * @param {Function} fn A function which takes 1 argument. Is expected to return a value or a promise which resolves to a value
+     * @param {Function} flush An optional flush function called just before the stream ends.
+     * @return {Pipe2} 
+     */
+    map<U>(fn: (file: T) => (U|Promise<U>), flush?:() => any): Pipe2<U> {
 
         let out = new Pipe2();
         /*return this.pipe<Pipe2<U>>(<Pipe2<U>>es.map(function(file, cb) {
@@ -102,8 +115,14 @@ export class Pipe2<T> extends Transform {
         return pipe.pipe(out);
         
     }
-
+    
+    /**
+     * Convert stream to a vinyl stream
+     * @param {String|Function} filename
+     * @return {Pipe2}
+     */
     vinyl(filename: string | ((a: any) => string), basedir?: string): Pipe2<File> {
+        let index = 0;
         return this.map<File>((file): any => {
             if (!(file instanceof File)) {
                 if (!Buffer.isBuffer(file) || !(file instanceof Stream)) {
@@ -127,6 +146,9 @@ export class Pipe2<T> extends Transform {
         });
     }
 
+    /**
+     * Convert values in the stream to buffers
+     */
     buffer(escape?: boolean, options?): Pipe2<Buffer> {
         escape = escape || false
         options = options || {};
@@ -156,6 +178,9 @@ export class Pipe2<T> extends Transform {
         });
     }
 
+    /**
+     * Convert a stream to a json encoded buffer stream
+     */
     json(options?): Pipe2<Buffer> {
         let out = false;
 
@@ -180,17 +205,22 @@ export class Pipe2<T> extends Transform {
         return Pipe2.stream(stream);
     }
 
+    /** Wrap a standard stream 
+     * @param {Stream} stream 
+    */
     wrap (stream:Stream): Pipe2<any> {
-        return Pipe2.stream(stream);
+        return this.pipe(Pipe2.stream(stream));
     }
-
+    
     pipe<T extends EventEmitter>(stream: T, options?:any): T {
         //stream.once('error', e => this.emit('error', e));
         this.once('error', e => stream.emit('error', e));
         return super.pipe(<any>stream, options);
     }
 
-
+    /** 
+     * Wait for the stream to finish and return an array with the values
+     */
     toArray(): Promise<T[]> {
         return new Promise((resolve, reject) => {
             this.once('error', e => reject(e));
@@ -201,6 +231,9 @@ export class Pipe2<T> extends Transform {
         });
     }
 
+    /**
+     * Wait for the stream to finish and return a buffer
+     */
     toBuffer(): Promise<Buffer> {
         return new Promise((resolve, reject) => {
             this.once('error', e => reject(e));
@@ -211,10 +244,18 @@ export class Pipe2<T> extends Transform {
         });
     }
 
+    /**
+     * Write the stream to path and wait for it to finish.
+     * You should make sure, that the stream is a vinyl stream
+     * @param {String} path
+     */
     toDest(path:string): Promise<void> {
         return this.wrap(vfs.dest(path)).wait();
     }
 
+    /**
+     * Wait for the stream to finish
+     */
     wait(): Promise<void> {
         return new Promise((resolve, reject) => {
             eos(this, (e) => {

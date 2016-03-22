@@ -1,6 +1,6 @@
 {
   "name": "pipe2",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Stream stuff",
   "main": "index.js",
   "scripts": {
@@ -23,5 +23,9 @@
     "vinyl-fs": "^2.4.2",
     "xlsx": "^0.8.0"
   },
-  "typings": "lib/pipe2"
+  "typings": "lib/pipe2",
+  "devDependencies": {
+    "mocha": "^2.4.5",
+    "should": "^8.2.2"
+  }
 }
