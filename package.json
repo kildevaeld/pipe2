@@ -1,13 +1,17 @@
 {
   "name": "pipe2",
   "version": "0.1.5",
-  "description": "",
+  "description": "Stream stuff",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kildevaeld/pipe2.git"
+  },
+  "author": "Rasmus Kildevæld <rasmuskildevaeld@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "any-promise": "^1.1.0",
     "dottie": "^1.1.1",
