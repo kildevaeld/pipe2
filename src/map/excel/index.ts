@@ -1,9 +1,10 @@
 'use strict';
 
-import File from 'vinyl';
 import * as Path from 'path';
 import {Pipe2} from '../../pipe2';
 import {Transform} from './transform'
+
+const File = require('vinyl');
 
 export function ExcelMap (options) {
   options = options || {};

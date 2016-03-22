@@ -1,16 +1,15 @@
 /// <reference path="../typings/main.d.ts" />
 import { Transform, Stream } from 'stream';
 import vfs from 'vinyl-fs';
-import Vinyl from 'vinyl';
 import { EventEmitter } from 'events';
 export declare const map: {
     json<T>(options?: any): (file: any) => Promise<T>;
-    excel(options?: any): (file: any) => Promise<Vinyl>;
+    excel(options?: any): (file: any) => Promise<File>;
 };
 export declare class Pipe2<T> extends Transform {
     static map: {
         json<T>(options?: any): (file: any) => Promise<T>;
-        excel(options?: any): (file: any) => Promise<Vinyl>;
+        excel(options?: any): (file: any) => Promise<File>;
     };
     static array<T>(array: T[]): Pipe2<T>;
     static stream(stream?: Stream): Pipe2<any>;
