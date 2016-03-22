@@ -3,7 +3,7 @@
 import {Transform, Readable, Stream} from 'stream';
 import * as es from 'event-stream';
 import {promiseToStream, GenToStream, arrayToGenerator} from './utils';
-import vfs from 'vinyl-fs'
+import * as vfs from 'vinyl-fs'
 import * as Path from 'path';
 import * as mappings from './map/index';
 import Vinyl from 'vinyl';

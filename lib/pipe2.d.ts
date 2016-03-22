@@ -1,6 +1,6 @@
 /// <reference path="../typings/main.d.ts" />
 import { Transform, Stream } from 'stream';
-import vfs from 'vinyl-fs';
+import * as vfs from 'vinyl-fs';
 import { EventEmitter } from 'events';
 export declare const map: {
     json<T>(options?: any): (file: any) => Promise<T>;

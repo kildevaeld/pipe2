@@ -6,29 +6,44 @@ import {Transform} from './transform'
 
 const File = require('vinyl');
 
-export function ExcelMap (options) {
-  options = options || {};
+export function ExcelMap(options) {
+    options = options || {};
 
-  return async function transform (file): Promise<File> {
+    return async function transform(file): Promise<File> {
 
-    if (!(file instanceof File)) {
-      throw new Error('excel: not a vinyl stream');
+        let data = file;
+
+        if (file instanceof File) {
+            if (file.isNull()) return null;
+            if (file.isStream()) {
+                data = (await Pipe2.stream(file.contents).toBuffer());
+            } else {
+                data = file.contents
+            }
+            //return cb(new Error('json: not a vinyl stream'));
+
+        } else if (Buffer.isBuffer(file)) {
+            data = data
+        } else if (typeof file === 'string') {
+            data = file;
+        } else if (file.constructor == Object) {
+            throw new Error('data cannot be an object');
+        } else if (Array.isArray(file)) {
+            throw new Error('data connot be an array');
+        }
+        
+
+        let result = Transform(data, options);
+        //let ext = Path.extname(file.path);
+
+        //file.path = file.path.replace(ext, '.json');
+
+        //file.contents = new Buffer(JSON.stringify(result));
+
+        return result;
     }
 
-    if (file.isNull()) return file;
-    if (file.isStream()) {
-        file.contents = await Pipe2.stream(file.contents).toBuffer();
-    }
 
-    let result = Transform(file.contents, options);
 
-    let ext = Path.extname(file.path);
-
-    file.path = file.path.replace(ext, '.json');
-
-    file.contents = new Buffer(JSON.stringify(result));
-
-    return file;
-  }
 
 };
